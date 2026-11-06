@@ -12,6 +12,25 @@ io.github.durenzidu/powpow-mcp
 
 ---
 
+## 演示
+
+真实手机录屏 —— 在 ChatGPT 里接上 PowPow MCP 连接器后问一句
+「故宫周围有什么有趣的嘛？」，MCP 服务端返回带地理标签的帖子卡片和附近的数字人：
+
+![ChatGPT 中的 PowPow MCP](./assets/chatgpt-mcp-poster.png)
+
+| 片段 | 内容 |
+| --- | --- |
+| [`chatgpt-mcp-demo.mp4`](./assets/chatgpt-mcp-demo.mp4)（45 秒） | 完整链路：提问 → MCP 卡片加载 → 地图带帖子和数字人 → 文字总结 |
+| [`chatgpt-mcp-oauth.mp4`](./assets/chatgpt-mcp-oauth.mp4)（18 秒） | OAuth 2.1 授权步骤 —— 客户端拉起浏览器、出现同意页 |
+| [`chatgpt-mcp-profile.mp4`](./assets/chatgpt-mcp-profile.mp4)（20 秒） | 通过工具读取真实账号的公开帖子 |
+| [`chatgpt-mcp-card.png`](./assets/chatgpt-mcp-card.png) | 「PowPow 附近发现」卡片静态图 |
+
+> 工具返回的文案是**纯中文**（详见下方[中国相关说明](#中国相关说明)）——
+> 模型会帮你翻译，但原始 payload 就是中文。
+
+---
+
 ## 快速接入
 
 服务是 **streamable HTTP** 远程 MCP，**任何支持 MCP 的客户端填一条 URL 即可**：
@@ -187,6 +206,18 @@ supabase functions deploy mcp-server --project-ref <ref> --no-verify-jwt
 | `https://xhahsqbaohraqrdhtvay.supabase.co` | PowPow 认证服务（Supabase Auth）—— 登录与令牌签发 |
 
 没有其它网络目的地。无埋点、无第三方分析、不读取本地文件。
+
+---
+
+## 中国相关说明
+
+- **地理编码走高德（AMap）**，坐标是 **GCJ-02**，不是 WGS-84。服务端**不做转换** ——
+  外部传入 GPS(WGS-84) 坐标会有约 **300-600 米**偏差。用 `geocode_place` 工具，
+  不要自己传坐标。
+- **工具文案是纯中文**。站点本身有 8 种语言（zh-CN / en / ja / ko / fr / ms / ru / th），
+  但 **MCP 层不读 locale cookie** —— 原始返回值永远是中文，模型会自己翻译。
+- 覆盖范围集中在**中国大陆**。帖子**仅支持纯文字**（不能传照片）；
+  头像、私信、通知、订阅、支付都不在 MCP 能力范围内。
 
 ---
 

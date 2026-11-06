@@ -14,6 +14,27 @@ offline check-in campaigns. This MCP server exposes that capability to AI client
 
 ---
 
+## Demo
+
+Recorded on a phone, driving the real server from ChatGPT with the PowPow MCP
+connector connected. Asking "故宫周围有什么有趣的嘛？" ("anything interesting
+around the Forbidden City?") and the MCP server returns a map with geotagged
+posts and nearby digital humans:
+
+![PowPow MCP in ChatGPT](./assets/chatgpt-mcp-poster.png)
+
+| Clip | What it shows |
+| --- | --- |
+| [`chatgpt-mcp-demo.mp4`](./assets/chatgpt-mcp-demo.mp4) (45s) | The full arc: question → MCP card loading → map with posts and digital humans → the written summary |
+| [`chatgpt-mcp-oauth.mp4`](./assets/chatgpt-mcp-oauth.mp4) (18s) | The OAuth 2.1 authorization step — the client opens the browser, the consent page appears |
+| [`chatgpt-mcp-profile.mp4`](./assets/chatgpt-mcp-profile.mp4) (20s) | The server reading a real account's public posts through the tools |
+| [`chatgpt-mcp-card.png`](./assets/chatgpt-mcp-card.png) | Still frame of the "PowPow 附近发现" card |
+
+> The tool output is Chinese-only — see [中国相关说明](#a-couple-of-china-specific-notes)
+> below. Models translate it for you; the raw payload stays Chinese.
+
+---
+
 ## Connect
 
 The server is a remote **streamable HTTP** MCP server. Point any compatible client at it:
