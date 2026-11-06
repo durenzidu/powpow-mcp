@@ -1,5 +1,7 @@
 # PowPow MCP Server
 
+[English](./README.md) | [简体中文](./README.zh-CN.md)
+
 Source for the **PowPow** remote MCP server, listed on the
 [official MCP Registry](https://registry.modelcontextprotocol.io/) as
 [`io.github.durenzidu/powpow-mcp`](https://registry.modelcontextprotocol.io/v0.1/servers/io.github.durenzidu%2Fpowpow-mcp/versions/latest).
