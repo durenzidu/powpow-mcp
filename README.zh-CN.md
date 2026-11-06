@@ -17,7 +17,10 @@ io.github.durenzidu/powpow-mcp
 真实手机录屏 —— 在 ChatGPT 里接上 PowPow MCP 连接器后问一句
 「故宫周围有什么有趣的嘛？」，MCP 服务端返回带地理标签的帖子卡片和附近的数字人：
 
-![ChatGPT 中的 PowPow MCP](./assets/chatgpt-mcp-poster.png)
+<p>
+  <img src="./assets/chatgpt-mcp-poster.png" width="280" alt="PowPow 附近发现卡片">
+  <img src="./assets/mcp-connection.png" width="280" alt="连接 PowPow 连接器">
+</p>
 
 | 片段 | 内容 |
 | --- | --- |

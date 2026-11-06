@@ -21,7 +21,10 @@ connector connected. Asking "故宫周围有什么有趣的嘛？" ("anything in
 around the Forbidden City?") and the MCP server returns a map with geotagged
 posts and nearby digital humans:
 
-![PowPow MCP in ChatGPT](./assets/chatgpt-mcp-poster.png)
+<p>
+  <img src="./assets/chatgpt-mcp-poster.png" width="280" alt="PowPow nearby discovery card">
+  <img src="./assets/mcp-connection.png" width="280" alt="Connecting the PowPow connector">
+</p>
 
 | Clip | What it shows |
 | --- | --- |
