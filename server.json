@@ -1,0 +1,18 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.durenzidu/powpow-mcp",
+  "title": "PowPow",
+  "description": "PowPow social MCP: create posts, discover places and people, chat with digital humans.",
+  "version": "1.0.4",
+  "websiteUrl": "https://global.powpow.online/mcp-docs",
+  "repository": {
+    "url": "https://github.com/durenzidu/powpow-mcp",
+    "source": "github"
+  },
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://global.powpow.online/api/mcp"
+    }
+  ]
+}

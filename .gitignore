@@ -1,0 +1,17 @@
+# Node
+node_modules/
+
+# Editors
+.vscode/
+.idea/
+
+# OS noise
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Local secrets — never commit
+.env
+.env.*
+*.pem
+*.key
