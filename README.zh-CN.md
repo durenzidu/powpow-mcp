@@ -90,8 +90,13 @@ claude mcp add --transport http powpow https://global.powpow.online/api/mcp
 
 **OAuth 2.1 + PKCE**，支持动态客户端注册。
 
-客户端拿到 `401` 后，会顺着 `WWW-Authenticate` 头里的 `resource_metadata` 找到资源元数据，
-再顺着 `authorization_servers` 找到授权服务器元数据，自己完成注册并发起授权。
+服务支持**未授权发现**：没有账号也能装上、启动、列出 34 个工具、读取地图 widget；
+只有 `tools/call` 需要授权 —— 返回 `401`，带 ASCII 的 `WWW-Authenticate` 挑战头，
+响应体是中文「请先连接 PowPow 账号」。挑战头必须保持 ASCII，标准宿主才能据此触发
+OAuth；中文只放在 body 里。
+
+客户端顺着 `401` 的 `resource_metadata` 找到资源元数据，再顺着 `authorization_servers`
+找到授权服务器元数据，自己完成注册并发起授权。拿到有效 token 后 34 个工具全部可用。
 
 | | |
 | --- | --- |
@@ -99,7 +104,12 @@ claude mcp add --transport http powpow https://global.powpow.online/api/mcp
 | 同意页 | 由 PowPow 自己托管，显示客户端申请了什么，可随时拒绝 |
 | 令牌 | 每请求校验，吊销 session 即刻失效 |
 
-> 本服务**不开放匿名访问**，`initialize` 也不例外 —— 匿名调用返回 `401` 属于预期行为。
+### 免授权方法白名单
+
+`initialize`、`notifications/initialized`、`ping`、`tools/list`、`resources/list`、
+`resources/templates/list`、`resources/read`、`prompts/list`、`server/discover`。
+其余方法（含所有 `tools/call`）一律要求授权；**未知新方法默认要求授权**，
+解析不出 method 的 POST 也要求授权。匿名发现层限 **60 次 / 分钟 / IP**（`429` + `Retry-After`）。
 
 ---
 
@@ -151,17 +161,41 @@ claude mcp add --transport http powpow https://global.powpow.online/api/mcp
 - **写权限可随时关闭。** 在 PowPow「设置 → AI 连接」里关掉 AI 写权限。
 - **注解区分读写。** 只读工具标 `readOnlyHint: true`；删除类写操作标 `destructiveHint: true`，
   客户端会为此打断用户。
+- **审计日志只留结构不留值。** 请求体只记方法名与参数形状，不记经纬度、地名、帖子正文等
+  任何值；审计与限流表仅服务端可写，匿名客户端无权限。
 
 ### 限流
 
 `find_nearby` / `geocode_place` / `nearby_attractions` 限 **12 次 / 60 秒 / 访问令牌**
 （它们会消耗第三方地理编码配额），其余 31 个工具不限流。
 
+匿名发现层（上节白名单方法）另限 **60 次 / 分钟 / IP**，由库内原子计数累加，
+超限返回 `429` + `Retry-After`；数据库异常时放行，不影响可用性。可信 IP 取
+XFF 右起第 2 段，并同时保留原始值供排查。
+
 ---
 
 ## 完整文档
 
 34 个工具的逐项说明：**https://global.powpow.online/mcp-docs**
+
+---
+
+## 近期更新
+
+- **v0.23.7（2026-11-08）· 未授权降级路径上线**：未授权也能装、能启动、工具可见；
+  `tools/call` 仍要求授权，返回 `401` + 中文「请先连接 PowPow 账号」。
+- **发现层白名单门禁**：只放行 9 个发现类方法，其余方法、未知新方法、
+  解析不出 method 的 POST 一律要求授权；中文只进响应体，挑战头保持 ASCII。
+- **匿名限流**：新建独立限流表 + 原子累加 RPC，60 次 / 分钟 / IP，
+  可信 IP 取 XFF 右起第 2 段。
+- **审计加固**：请求体脱敏只留结构、`client_ip` 记 `trusted:` / `raw:` 双份、
+  审计写入改 service_role、匿名客户端对审计与限流表零权限。
+- **会话与开关**：只有 `session_not_found` / `session_expired` 才重建影子会话
+  （避免任意 403 改密码吊销全部 session）；`MCP_OAUTH` 关闭时启动期告警。
+- **SDK 2.3.1 协议兼容**：legacy body 剥离现代协议头、缺失时补 `Mcp-Name`；
+  `SERVER_VERSION` 升到 `0.23.7`。
+- **顺带修复**：用户卡片距离恒为 0 米、migration 编号重号、审计表可被匿名灌行。
 
 ---
 

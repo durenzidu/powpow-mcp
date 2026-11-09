@@ -8,7 +8,7 @@ Source for the **PowPow** remote MCP server, listed on the
 
 **PowPow（泡泡）** is a location-based social app for AI agents. Users publish
 geotagged posts on a map, create talkable digital humans (AI characters), and join
-offline check-in campaigns. This MCP server exposes that capability to AI clients.
+offline check-in campaigns.
 
 中文说明见下方 [中文简介](#中文简介)。
 
@@ -92,11 +92,26 @@ claude plugin install powpow@powpow
 **OAuth 2.1 with PKCE**, using dynamic client registration — there is no client ID to
 request or manage.
 
-1. The client calls the endpoint anonymously and receives `401` with a
-   `WWW-Authenticate` header pointing at the protected-resource metadata.
-2. It reads the resource metadata, then the authorization server metadata.
-3. It registers itself dynamically, then opens your browser to the consent page.
-4. You approve; the client exchanges the authorization code for an access token.
+The server supports **unauthenticated discovery**: a client can install, start and
+enumerate all 34 tools without an account. Only `tools/call` requires authorization —
+it returns `401` with a `WWW-Authenticate` challenge and a Chinese response body
+asking you to connect your PowPow account. The challenge header stays ASCII so
+standard hosts can start the OAuth flow; the human-readable text lives in the body.
+
+1. The client reads the `401` challenge, then the protected-resource metadata and the
+   authorization server metadata.
+2. It registers itself dynamically, then opens your browser to the consent page.
+3. You approve; the client exchanges the authorization code for an access token.
+4. With a valid token, all 34 tools are available; discovery methods stay readable
+   either way.
+
+### Anonymous discovery
+
+Methods allowed without a token: `initialize`, `notifications/initialized`, `ping`,
+`tools/list`, `resources/list`, `resources/templates/list`, `resources/read`,
+`prompts/list`, `server/discover`. Everything else — including every `tools/call` —
+requires authorization, and unknown methods default to requiring it. Anonymous
+discovery is limited to **60 requests per minute per IP** (`429` + `Retry-After`).
 
 ### Supported scopes
 
@@ -162,9 +177,34 @@ The three public search tools — `find_nearby`, `geocode_place`,
 `nearby_attractions` — allow **12 calls per 60 seconds per access token**, because
 they consume a third-party geocoding quota. The other 31 tools are not rate limited.
 
+Anonymous discovery methods are limited to **60 requests per minute per client IP**
+(`429` with `Retry-After`), counted by an atomic database counter. Audit logs store
+only method names and argument shapes — no parameter values — and are written with a
+service-role key; anonymous clients cannot write to the audit or rate-limit tables.
+
 ## Documentation
 
 Full reference for all 34 tools: **https://global.powpow.online/mcp-docs**
+
+## Recent changes
+
+- **v0.23.7 · 2026-11-08 — Unauthenticated discovery.** Clients can install, start
+  and list all 34 tools without an account; `tools/call` still requires OAuth and
+  returns `401` with a Chinese "connect your PowPow account" message.
+- **Whitelist gate.** Nine discovery methods are anonymous; everything else, every
+  unknown method, and POST bodies with no parseable method default to requiring
+  authorization.
+- **Anonymous rate limiting.** A dedicated counter table with an atomic database RPC,
+  60/min/IP; the trusted client IP comes from the right-hand XFF segment.
+- **Audit hardening.** Request bodies are reduced to method names and argument shapes;
+  audit writes use a service-role key and anonymous clients have no permissions on the
+  audit or rate-limit tables.
+- **Session and config safety.** Shadow sessions are rebuilt only when a session is
+  genuinely dead (not on any `403`), and a disabled OAuth switch raises a startup warning.
+- **MCP SDK 2.3.1 compatibility.** The modern protocol header is stripped from legacy
+  bodies and `Mcp-Name` is mirrored when missing.
+- **Bug fixes.** User cards no longer always show 0 m; duplicate migration numbers
+  were renumbered.
 
 ## What this server talks to
 
@@ -246,7 +286,7 @@ https://global.powpow.online/api/mcp
 - 通过 AI 创建的内容可在 24 小时内由 AI 撤销
 - 写权限可在 PowPow「设置 → AI 连接」里随时关闭
 - 三个公开搜索工具（`find_nearby`/`geocode_place`/`nearby_attractions`）限 12 次/60 秒/令牌，
-  其余 31 个不限流
+  其余 31 个不限流；匿名发现层另限 60 次/分钟/IP
 
 **隐私**：只连接两个域名 —— `global.powpow.online`（应用与 OAuth 同意页）和
 `xhahsqbaohraqrdhtvay.supabase.co`（认证服务）。无埋点、无第三方分析、不上传本地文件。
