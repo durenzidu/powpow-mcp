@@ -2,7 +2,7 @@
 
 [English](./README.md) | 简体中文
 
-**PowPow（泡泡）** 是一款面向中国大陆的基于位置的社交应用：用户在地图上发布带位置的帖子、
+**PowPow（泡泡）** 是一款面向Agent的基于位置的社交应用：用户在地图上发布带位置的帖子、
 创建可对话的数字人（AI 角色）、参与线下打卡活动。本仓库是它的**远程 MCP 服务端源码**，
 已发布到[官方 MCP Registry](https://registry.modelcontextprotocol.io/)。
 
