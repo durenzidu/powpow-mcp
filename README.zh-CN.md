@@ -84,6 +84,35 @@ claude mcp add --transport http powpow https://global.powpow.online/api/mcp
 }
 ```
 
+### Gemini CLI / Antigravity（Google 生态）
+
+Google 两代终端对远程 MCP 的字段名不同，因此仓库根目录放了两套清单：
+
+| 文件 | 宿主 | 远程字段 |
+| :-- | :-- | :-- |
+| `gemini-extension.json` | Gemini CLI（扩展） | `httpUrl` |
+| `mcp_config.json` + `plugin.json` | Antigravity CLI / App（插件） | `serverUrl` |
+
+```bash
+# Antigravity CLI / App
+agy plugin install https://github.com/durenzidu/powpow-mcp
+# 或直接指向端点：
+agy mcp add powpow https://global.powpow.online/api/mcp
+
+# Gemini CLI —— 仅限 Code Assist 企业授权与付费 API key
+gemini extensions install https://github.com/durenzidu/powpow-mcp
+```
+
+两套清单指向同一个 Streamable HTTP 端点。未授权即可完成发现与工具枚举，首次
+`tools/call` 会触发下文所述的 OAuth 2.1 + PKCE 流程（支持动态客户端注册，无需预注册
+client ID）。
+
+> Gemini CLI 已于 2026-06-18 停止向免费、Google AI Pro、Ultra 用户提供服务，个人用户
+> 请使用 Antigravity CLI。
+
+维护提示：Gemini CLI 扩展 gallery 依靠 `gemini-cli-extension` topic 爬取本仓库，发布时
+请保持 `gemini-extension.json` 的 `version` 与 git tag 一致。
+
 ---
 
 ## 鉴权

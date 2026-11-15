@@ -87,6 +87,37 @@ claude plugin marketplace add durenzidu/powpow-claude-plugin
 claude plugin install powpow@powpow
 ```
 
+### Gemini CLI / Antigravity (Google)
+
+Two manifests live at the repository root because Google's two terminal agents use
+different field names for a remote server:
+
+| File | Host | Remote field |
+| :-- | :-- | :-- |
+| `gemini-extension.json` | Gemini CLI (extension) | `httpUrl` |
+| `mcp_config.json` + `plugin.json` | Antigravity CLI / App (plugin) | `serverUrl` |
+
+```bash
+# Antigravity CLI / App
+agy plugin install https://github.com/durenzidu/powpow-mcp
+# or point at the endpoint directly:
+agy mcp add powpow https://global.powpow.online/api/mcp
+
+# Gemini CLI — enterprise Code Assist licenses and paid API keys only
+gemini extensions install https://github.com/durenzidu/powpow-mcp
+```
+
+Both manifests point at the same Streamable HTTP endpoint. Discovery works without a
+token; the first `tools/call` triggers the OAuth 2.1 + PKCE flow with dynamic client
+registration described below — there is no client ID to pre-register.
+
+> Gemini CLI stopped serving free, Google AI Pro and Ultra users on 2026-06-18.
+> Individual users should use Antigravity CLI.
+
+Maintainers: the Gemini CLI extension gallery crawls this repository because of the
+`gemini-cli-extension` topic. Keep `version` in `gemini-extension.json` in sync with
+the release tag.
+
 ## Authentication
 
 **OAuth 2.1 with PKCE**, using dynamic client registration — there is no client ID to

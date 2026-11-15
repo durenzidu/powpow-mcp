@@ -1,0 +1,7 @@
+{
+  "mcpServers": {
+    "powpow": {
+      "serverUrl": "https://global.powpow.online/api/mcp"
+    }
+  }
+}
