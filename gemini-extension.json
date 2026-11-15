@@ -1,7 +1,7 @@
 {
   "name": "powpow-mcp",
   "version": "1.0.0",
-  "description": "PowPow 远程 MCP 智能助手扩展：查附近的人与地点、发帖、和数字人互动",
+  "description": "PowPow（泡泡）远程 MCP 服务 —— 附近发现、地点探索、帖子互动与数字人",
   "mcpServers": {
     "powpow": {
       "httpUrl": "https://global.powpow.online/api/mcp",
